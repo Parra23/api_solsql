@@ -1,0 +1,6 @@
+services:
+  api_solsql:
+    image: ${DOCKER_REGISTRY-}apisolsql
+    build:
+      context: .
+      dockerfile: api_solsql/Dockerfile

@@ -1,0 +1,6 @@
+@api_solsql_HostAddress = http://localhost:5167
+
+GET {{api_solsql_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
