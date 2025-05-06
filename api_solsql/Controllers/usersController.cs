@@ -36,22 +36,6 @@ namespace api_solsql.Controllers
                 return StatusCode(500,new { message = "Error al obtener los usuarios",error = ex.Message });
             }
         }
-
-
-        // GET: api/users/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<users>> Getusers(int id)
-        {
-            var users = await _context.Users.FindAsync(id);
-
-            if (users == null)
-            {
-                return NotFound();
-            }
-
-            return users;
-        }
-
           // GET: api/users/status/{status}
         [HttpGet("status/{status}")]
         public async Task<ActionResult<IEnumerable<users>>> GetUsersByStatus(int status) {
@@ -75,7 +59,7 @@ namespace api_solsql.Controllers
                 return StatusCode(500,new { message = "Error al obtener los usuarios",error = ex.Message });
             }
         }
-         // GET: api/users/correo
+         // GET: api/users/email
         [HttpGet("{email}")]
         public async Task<ActionResult<users>> Getusers(String email)
         {
