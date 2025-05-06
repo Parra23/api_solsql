@@ -4,6 +4,8 @@
         public string Name_user { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
+        public int User_type { get; set; }
         public DateTime Registration_date { get; set; }
+        public int Is_active { get; set; }
     }
 }

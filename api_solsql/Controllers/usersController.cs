@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api_solsql.Context;
 using api_solsql.Models;
+using Microsoft.Data.SqlClient;
+using MySqlConnector;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 
 namespace api_solsql.Controllers
 {
@@ -21,12 +24,19 @@ namespace api_solsql.Controllers
             _context = context;
         }
 
-        // GET: api/users
+        // GET: api/users/
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<users>>> GetUsers()
-        {
-            return await _context.Users.ToListAsync();
+        public async Task<ActionResult<IEnumerable<users>>> Getusers() {
+            try {
+                var usersList = await _context.Users
+                    .FromSqlRaw("CALL sp_get_all_users()")
+                    .ToListAsync();
+                return Ok(usersList);
+            } catch (Exception ex) {
+                return StatusCode(500,new { message = "Error al obtener los usuarios",error = ex.Message });
+            }
         }
+
 
         // GET: api/users/5
         [HttpGet("{id}")]
@@ -42,67 +52,92 @@ namespace api_solsql.Controllers
             return users;
         }
 
-        // PUT: api/users/5
+          // GET: api/users/status/{status}
+        [HttpGet("status/{status}")]
+        public async Task<ActionResult<IEnumerable<users>>> GetUsersByStatus(int status) {
+            try {
+                var usersList = new List<users>();
+
+                if (status == 1) {
+                    usersList = await _context.Users
+                        .FromSqlRaw("CALL sp_get_all_users_active()")
+                        .ToListAsync();
+                } else if (status == 0) {
+                    usersList = await _context.Users
+                        .FromSqlRaw("CALL sp_get_all_users_desactive()")
+                        .ToListAsync();
+                } else {
+                    return BadRequest(new { message = "El estado debe ser activo (1) o inactivo (0)" });
+                }
+
+                    return Ok(usersList);
+            } catch (Exception ex) {
+                return StatusCode(500,new { message = "Error al obtener los usuarios",error = ex.Message });
+            }
+        }
+         // GET: api/users/correo
+        [HttpGet("{email}")]
+        public async Task<ActionResult<users>> Getusers(String email)
+        {
+            try {
+                var users = await _context.Users
+                .FromSqlInterpolated($"CALL sp_get_user_by_email({email})")
+                .ToListAsync();
+                return Ok(users);
+            } catch (MySqlException ex) {
+                // Error específico de MySQL (requiere: using MySql.Data.MySqlClient)
+                return StatusCode(500,new {error = ex.Message });
+            } catch (Exception ex) {
+                // Otro tipo de error
+                return StatusCode(500,new { message = "Error inesperado",error = ex.Message });
+            }
+        }
+         // PUT: api/users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> Putusers(int id, users users)
+        public async Task<IActionResult> Putusers(int id, users user)
         {
-            if (id != users.Id)
-            {
-                return BadRequest();
+            try {
+                await _context.Database.ExecuteSqlInterpolatedAsync(
+                    $"CALL sp_update_user({id}, {user.Name_user}, {user.Email}, {user.User_type}, {user.Password}, {user.Is_active})"
+                );
+                return Ok(new { message = "Usuario actualizado exitosamente." });
+            } catch (MySqlException ex) {
+                return StatusCode(500,new { error = ex.Message });
+            } catch (Exception ex) {
+                return StatusCode(500,new { message = "Error inesperado",error = ex.Message });
             }
-
-            _context.Entry(users).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!usersExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
         }
-
         // POST: api/users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<users>> Postusers(users users)
-        {
-            _context.Users.Add(users);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("Getusers", new { id = users.Id }, users);
+        public async Task<IActionResult> Postusers([FromBody] users user) {
+            try {
+                await _context.Database.ExecuteSqlInterpolatedAsync(
+                    $"CALL sp_insert_user({user.Name_user}, {user.Email}, {user.User_type}, {user.Password})"
+                );
+                return Ok(new { message = "Usuario insertado exitosamente." });
+            } catch (MySqlException ex) {
+                return StatusCode(500,new { error = ex.Message });
+            } catch (Exception ex) {
+                return StatusCode(500,new { message = "Error inesperado",error = ex.Message });
+            }
         }
 
         // DELETE: api/users/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Deleteusers(int id)
-        {
-            var users = await _context.Users.FindAsync(id);
-            if (users == null)
-            {
-                return NotFound();
+        public async Task<IActionResult> Deleteusers(int id) {
+            try {
+                var users_delete = await _context.Database
+                    .ExecuteSqlInterpolatedAsync($"CALL sp_delete_user({id})");
+
+                return Ok(users_delete);
+            } catch (Exception ex) {
+                return StatusCode(500,new { message = "Error inesperado",error = ex.Message });
             }
-
-            _context.Users.Remove(users);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
-        private bool usersExists(int id)
-        {
-            return _context.Users.Any(e => e.Id == id);
-        }
+
+
     }
 }
