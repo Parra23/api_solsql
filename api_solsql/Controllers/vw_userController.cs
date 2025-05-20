@@ -1,34 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api_solsql.Context;
 using api_solsql.Models;
-using Microsoft.Data.SqlClient;
 using MySqlConnector;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
-
 namespace api_solsql.Controllers
 {
+
     [Route("api/[controller]")]
     [ApiController]
-    public class usersController : ControllerBase
+    public class vw_userController : ControllerBase
+
     {
         private readonly ContextDB _context;
 
-        public usersController(ContextDB context)
+        public vw_userController(ContextDB context)
         {
             _context = context;
         }
-
         // GET: api/users/
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<users>>> Getusers() {
+        public async Task<ActionResult<IEnumerable<vw_user>>> Getusers() {
             try {
-                var usersList = await _context.Users
+                var usersList = await _context.VW_users
                     .FromSqlRaw("CALL sp_get_all_users()")
                     .ToListAsync();
                 return Ok(usersList);
@@ -38,16 +31,16 @@ namespace api_solsql.Controllers
         }
           // GET: api/users/status/{status}
         [HttpGet("status/{status}")]
-        public async Task<ActionResult<IEnumerable<users>>> GetUsersByStatus(int status) {
+        public async Task<ActionResult<IEnumerable<vw_user>>> GetUsersByStatus(int status) {
             try {
-                var usersList = new List<users>();
+                var usersList = new List<vw_user>();
 
                 if (status == 1) {
-                    usersList = await _context.Users
+                    usersList = await _context.VW_users
                         .FromSqlRaw("CALL sp_get_all_users_active()")
                         .ToListAsync();
                 } else if (status == 0) {
-                    usersList = await _context.Users
+                    usersList = await _context.VW_users
                         .FromSqlRaw("CALL sp_get_all_users_desactive()")
                         .ToListAsync();
                 } else {
@@ -61,10 +54,10 @@ namespace api_solsql.Controllers
         }
          // GET: api/users/email
         [HttpGet("{email}")]
-        public async Task<ActionResult<users>> Getusers(String email)
+        public async Task<ActionResult<vw_user>> Getusers(String email)
         {
             try {
-                var users = await _context.Users
+                var users = await _context.VW_users
                 .FromSqlInterpolated($"CALL sp_get_user_by_email({email})")
                 .ToListAsync();
                 return Ok(users);
@@ -79,11 +72,11 @@ namespace api_solsql.Controllers
          // PUT: api/users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> Putusers(int id, users user)
+        public async Task<IActionResult> Putusers(int id, vw_user user)
         {
             try {
                 await _context.Database.ExecuteSqlInterpolatedAsync(
-                    $"CALL sp_update_user({id}, {user.Name_user}, {user.Email}, {user.User_type}, {user.Password}, {user.Is_active})"
+                    $"CALL sp_update_user({id}, {user.Name}, {user.Email}, {user.Role}, {user.Password}, {user.Status})"
                 );
                 return Ok(new { message = "Usuario actualizado exitosamente." });
             } catch (MySqlException ex) {
@@ -95,10 +88,10 @@ namespace api_solsql.Controllers
         // POST: api/users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<IActionResult> Postusers([FromBody] users user) {
+        public async Task<IActionResult> Postusers([FromBody] vw_user user) {
             try {
                 await _context.Database.ExecuteSqlInterpolatedAsync(
-                    $"CALL sp_insert_user({user.Name_user}, {user.Email}, {user.User_type}, {user.Password})"
+                    $"CALL sp_insert_user({user.Name}, {user.Email}, {user.Role}, {user.Password})"
                 );
                 return Ok(new { message = "Usuario insertado exitosamente." });
             } catch (MySqlException ex) {
@@ -107,7 +100,6 @@ namespace api_solsql.Controllers
                 return StatusCode(500,new { message = "Error inesperado",error = ex.Message });
             }
         }
-
         // DELETE: api/users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Deleteusers(int id) {
@@ -120,8 +112,6 @@ namespace api_solsql.Controllers
                 return StatusCode(500,new { message = "Error inesperado",error = ex.Message });
             }
         }
-
-
 
     }
 }
