@@ -25,7 +25,7 @@ namespace api_solsql.Controllers
             try
             {
                 var users = await _context.LoginRequests
-                    .FromSqlInterpolated($"CALL sp_login({request.Email}, {request.Password}), {request.Role})")
+                    .FromSqlInterpolated($"CALL sp_login({request.Email}, {request.Password}, {request.Role})")
                     .ToListAsync();
                 if (users.Count == 0)
                     return Unauthorized(new { message = "Credenciales inválidas" });
