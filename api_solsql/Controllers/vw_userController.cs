@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using api_solsql.Context;
 using api_solsql.Models;
 using MySqlConnector;
+using BcryptNet = BCrypt.Net.BCrypt;
+
 namespace api_solsql.Controllers
 {
 
@@ -108,8 +110,11 @@ namespace api_solsql.Controllers
         [HttpPost]
         public async Task<IActionResult> Postusers([FromBody] vw_user user) {
             try {
+                // Encriptar la contraseña antes de guardarla
+                string hashedPassword = BcryptNet.HashPassword(user.Password);
+
                 await _context.Database.ExecuteSqlInterpolatedAsync(
-                    $"CALL sp_insert_user({user.Name}, {user.Email}, {user.Role}, {user.Password})"
+                    $"CALL sp_insert_user({user.Name}, {user.Email}, {user.Role}, {hashedPassword})"
                 );
                 return Ok(new { message = "Usuario insertado exitosamente." });
             } catch (MySqlException ex) {
@@ -118,6 +123,7 @@ namespace api_solsql.Controllers
                 return StatusCode(500,new { message = "Error inesperado",error = ex.Message });
             }
         }
+
         // DELETE: api/users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Deleteusers(int id) {
