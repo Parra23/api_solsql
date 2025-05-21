@@ -69,9 +69,27 @@ namespace api_solsql.Controllers
                 return StatusCode(500,new { message = "Error inesperado",error = ex.Message });
             }
         }
+        // GET: api/users/login
+        [HttpGet("login/{email}/{password}")]
+        public async Task<ActionResult<vw_user>> GetusersLogin(String email, String password)
+        {
+            try {
+                var users = await _context.VW_users
+                .FromSqlInterpolated($"CALL sp_login({email}, {password})")
+                .ToListAsync();
+                return Ok(users);
+            } catch (MySqlException ex) {
+                // Error específico de MySQL (requiere: using MySql.Data.MySqlClient)
+                return StatusCode(500,new {error = ex.Message });
+            } catch (Exception ex) {
+                // Otro tipo de error
+                return StatusCode(500,new { message = "Error inesperado",error = ex.Message });
+            }
+        }
+        
          // PUT: api/users/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+            // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+            [HttpPut("{id}")]
         public async Task<IActionResult> Putusers(int id, vw_user user)
         {
             try {

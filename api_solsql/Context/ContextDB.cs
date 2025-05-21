@@ -2,9 +2,12 @@
 using Microsoft.EntityFrameworkCore;
 
 namespace api_solsql.Context {
-    public class ContextDB : DbContext{
-        public ContextDB(DbContextOptions<ContextDB> options) : base(options) {
+    public class ContextDB : DbContext
+    {
+        public ContextDB(DbContextOptions<ContextDB> options) : base(options)
+        {
         }
         public DbSet<vw_user> VW_users { get; set; }
+        public DbSet<LoginRequest> LoginRequests { get; set; }
     }
 }
