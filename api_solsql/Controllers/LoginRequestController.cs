@@ -27,10 +27,8 @@ namespace api_solsql.Controllers
                 var users = await _context.LoginRequests
                     .FromSqlInterpolated($"CALL sp_login({request.Email}, {request.Password})")
                     .ToListAsync();
-
                 if (users.Count == 0)
                     return Unauthorized(new { message = "Credenciales inválidas" });
-
                 return Ok(users.First());
             }
             catch (MySqlException ex)
