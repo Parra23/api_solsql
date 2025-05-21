@@ -17,11 +17,6 @@ namespace api_solsql
             builder.Services.AddSwaggerGen();
 
 
-            // Add Entity Framework Core with SQL Server
-            //builder.Services.AddDbContext<Context.ContextDB>(options =>
-            //    options.UseSqlServer(builder.Configuration.GetConnectionString("Connection_sqlserver")));
-
-
             // Add the database 
             builder.Services.AddDbContext<ContextDB>(options =>
             options.UseMySql(
@@ -54,7 +49,6 @@ namespace api_solsql
             
             // Habilitar el middleware de caché de respuestas
             app.UseResponseCaching();
-
 
             // Usa CORS
             app.UseCors("AllowAll");
