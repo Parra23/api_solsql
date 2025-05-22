@@ -31,8 +31,25 @@ namespace api_solsql.Controllers
                 return StatusCode(500,new { message = "Error al obtener los usuarios",error = ex.Message });
             }
         }
+        // GET: api/users/{id}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<vw_user>> Getusers(int id) {
+            try {
+                var users = await _context.VW_users
+                    .FromSqlInterpolated($"CALL sp_get_user_by_id({id})")
+                    .ToListAsync();
+
+                if (users == null || users.Count == 0) {
+                    return NotFound(new { message = "Usuario no encontrado" });
+                }
+
+                return Ok(users);
+            } catch (Exception ex) {
+                return StatusCode(500,new { message = "Error al obtener el usuario",error = ex.Message });
+            }
+        }
           // GET: api/users/status/{status}
-        [HttpGet("status/{status}")]
+            [HttpGet("status/{status}")]
         public async Task<ActionResult<IEnumerable<vw_user>>> GetUsersByStatus(int status) {
             try {
                 var usersList = new List<vw_user>();
@@ -52,23 +69,6 @@ namespace api_solsql.Controllers
                     return Ok(usersList);
             } catch (Exception ex) {
                 return StatusCode(500,new { message = "Error al obtener los usuarios",error = ex.Message });
-            }
-        }
-         // GET: api/users/email
-        [HttpGet("{email}")]
-        public async Task<ActionResult<vw_user>> Getusers(String email)
-        {
-            try {
-                var users = await _context.VW_users
-                .FromSqlInterpolated($"CALL sp_get_user_by_email({email})")
-                .ToListAsync();
-                return Ok(users);
-            } catch (MySqlException ex) {
-                // Error específico de MySQL (requiere: using MySql.Data.MySqlClient)
-                return StatusCode(500,new {error = ex.Message });
-            } catch (Exception ex) {
-                // Otro tipo de error
-                return StatusCode(500,new { message = "Error inesperado",error = ex.Message });
             }
         }
         // GET: api/users/login
