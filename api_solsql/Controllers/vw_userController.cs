@@ -88,24 +88,31 @@ namespace api_solsql.Controllers
                 return StatusCode(500,new { message = "Error inesperado",error = ex.Message });
             }
         }
-        
          // PUT: api/users/5
-            // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-            [HttpPut("{id}")]
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+       [HttpPut("{id}")]
         public async Task<IActionResult> Putusers(int id, vw_user user)
         {
             try {
+                // Verifica si la contraseña ya está hasheada o si es una nueva
+                if (!user.Password.StartsWith("$2a$")) {
+                    user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+                }
+
                 await _context.Database.ExecuteSqlInterpolatedAsync(
                     $"CALL sp_update_user({id}, {user.Name}, {user.Email}, {user.Role}, {user.Password}, {user.Status})"
                 );
+
                 return Ok(new { message = "Usuario actualizado exitosamente." });
+
             } catch (MySqlException ex) {
-                return StatusCode(500,new { error = ex.Message });
+                return StatusCode(500, new { error = ex.Message });
+
             } catch (Exception ex) {
-                return StatusCode(500,new { message = "Error inesperado",error = ex.Message });
+                return StatusCode(500, new { message = "Error inesperado", error = ex.Message });
             }
         }
-        // POST: api/users
+ // POST: api/users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<IActionResult> Postusers([FromBody] vw_user user) {
