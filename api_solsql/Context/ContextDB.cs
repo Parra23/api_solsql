@@ -13,5 +13,6 @@ namespace api_solsql.Context
         public DbSet<Departments> departments { get; set; }
         public DbSet<Cities> cities { get; set; }
         public DbSet<PlaceTypes> placeTypes { get; set; }
+        public DbSet<Photos> photos { get; set; }
     }
 }
