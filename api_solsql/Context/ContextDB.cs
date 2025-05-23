@@ -1,7 +1,8 @@
 ﻿using api_solsql.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace api_solsql.Context {
+namespace api_solsql.Context
+{
     public class ContextDB : DbContext
     {
         public ContextDB(DbContextOptions<ContextDB> options) : base(options)
@@ -9,5 +10,8 @@ namespace api_solsql.Context {
         }
         public DbSet<vw_user> VW_users { get; set; }
         public DbSet<LoginRequest> LoginRequests { get; set; }
+        public DbSet<Departments> departments { get; set; }
+        public DbSet<Cities> cities { get; set; }
+        public DbSet<PlaceTypes> placeTypes { get; set; }
     }
 }
