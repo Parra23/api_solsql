@@ -25,80 +25,132 @@ namespace api_solsql.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Photos>>> Getphotos()
         {
-            return await _context.photos.ToListAsync();
+            var photos = await _context.photos
+                .FromSqlRaw("CALL pa_get_all_photos()")
+                .ToListAsync();
+
+            return photos;
         }
+
 
         // GET: api/Photos/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Photos>> GetPhotos(int id)
         {
-            var photos = await _context.photos.FindAsync(id);
-
-            if (photos == null)
+            try
             {
-                return NotFound();
-            }
+                var photos = await _context.photos
+                    .FromSqlRaw("CALL pa_get_photo_by_id({0})", id)
+                    .ToListAsync();
 
-            return photos;
+                var photo = photos.FirstOrDefault();
+
+                if (photo == null)
+                {
+                    return NotFound(new { message = "La foto no existe" });
+                }
+
+                return photo;
+            }
+            catch (Exception ex)
+            {
+                // Puedes registrar el error aquí si usas un sistema de logs
+                return StatusCode(500, new { message = "Error al obtener la foto", detail = ex.Message });
+            }
         }
 
+
+        // GET: api/Photos/place/3
+        [HttpGet("place/{placeId}")]
+        public async Task<ActionResult<IEnumerable<Photos>>> GetPhotosByPlace(int p_place_id)
+        {
+            try
+            {
+                var fotos = await _context.photos
+                    .FromSqlInterpolated($"CALL pa_fotos_lugar({p_place_id})")
+                    .ToListAsync();
+
+                if (fotos == null || fotos.Count == 0)
+                {
+                    return NotFound("No hay fotos para este lugar.");
+                }
+
+                return fotos;
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al ejecutar el procedimiento almacenado: {ex.Message}");
+            }
+        }
+
+
         // PUT: api/Photos/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPhotos(int id, Photos photos)
+        public async Task<IActionResult> PutPhotos(int id, [FromBody] Photos photos)
         {
             if (id != photos.photo_id)
             {
-                return BadRequest();
+                return BadRequest("El ID de la foto no coincide.");
             }
-
-            _context.Entry(photos).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PhotosExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+                int result = await _context.Database.ExecuteSqlInterpolatedAsync(
+                    $"CALL sp_update_photos({photos.photo_id}, {photos.url}, {photos.description})"
+                );
 
-            return NoContent();
+                return Ok(new { message = "Successfully updated registration." });
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, $"Error al actualizar la foto: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error inesperado: {ex.Message}");
+            }
         }
+
 
         // POST: api/Photos
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Photos>> PostPhotos(Photos photos)
+        public async Task<IActionResult> PostPhotos(Photos photos)
         {
-            _context.photos.Add(photos);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.Database.ExecuteSqlInterpolatedAsync(
+                    $"CALL sp_insert_photos({photos.place_id}, {photos.url}, {photos.description})"
+                );
 
-            return CreatedAtAction("GetPhotos", new { id = photos.photo_id }, photos);
+                return Ok(new { message = "Successfully inserted registration." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al insertar la foto: {ex.Message}");
+            }
         }
+
 
         // DELETE: api/Photos/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePhotos(int id)
         {
-            var photos = await _context.photos.FindAsync(id);
-            if (photos == null)
+            try
             {
-                return NotFound();
+                var result = await _context.Database.ExecuteSqlRawAsync("CALL sp_delete_photos({0})", id);
+                return NoContent();
             }
-
-            _context.photos.Remove(photos);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (DbUpdateException ex)
+            {
+                //  si la foto no existe
+                return NotFound(new { message = "La foto no existe" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error interno del servidor", detail = ex.Message });
+            }
         }
+
 
         private bool PhotosExists(int id)
         {
