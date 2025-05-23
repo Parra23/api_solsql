@@ -14,5 +14,12 @@ namespace api_solsql.Context
         public DbSet<Cities> cities { get; set; }
         public DbSet<PlaceTypes> placeTypes { get; set; }
         public DbSet<Photos> photos { get; set; }
+        public DbSet<vw_logs_register> vw_logs_registers { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<vw_logs_register>().HasNoKey();
+            base.OnModelCreating(modelBuilder);
+        }
     }
+
 }
