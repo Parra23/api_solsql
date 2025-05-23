@@ -7,6 +7,7 @@ public class Cities
 	[Key]
 	[Column("city_id")]
 	public int Id { get; set; }
-	public string? Name { get; set; }
+	public string? Name_city { get; set; }
 	public int department_id { get; set; }
-}
+	public string? Name_department { get; set; }
+} 
