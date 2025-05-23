@@ -61,7 +61,7 @@ namespace api_solsql.Controllers
 
 
         // GET: api/Photos/place/3
-        [HttpGet("place/{placeId}")]
+        [HttpGet("place/{p_place_id}")]
         public async Task<ActionResult<IEnumerable<Photos>>> GetPhotosByPlace(int p_place_id)
         {
             try
