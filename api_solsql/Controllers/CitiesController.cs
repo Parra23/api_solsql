@@ -56,7 +56,7 @@ namespace api_solsql.Controllers
             try
             {
                 await _context.Database.ExecuteSqlInterpolatedAsync(
-                    $"CALL sp_insert_cities({city.Name_city}, {city.department_id})"
+                    $"CALL sp_insert_cities({city.Name_city}, {city.Department_id})"
                 );
                 return Ok(new { message = "Successfully inserted registration." });
             }
@@ -72,7 +72,7 @@ namespace api_solsql.Controllers
             try
             {
                 await _context.Database.ExecuteSqlInterpolatedAsync(
-                    $"CALL sp_update_cities({id}, {city.Name_city}, {city.department_id})"
+                    $"CALL sp_update_cities({id}, {city.Name_city}, {city.Department_id})"
                 );
                 return Ok(new { message = "Successfully updated registration." });
             }
