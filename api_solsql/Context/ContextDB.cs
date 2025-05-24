@@ -16,6 +16,7 @@ namespace api_solsql.Context
         public DbSet<Photos> photos { get; set; }
         public DbSet<Comments> comments { get; set; }
         public DbSet<CommentsPlace> commentsPlace { get; set; }
+        public DbSet<Places> places { get; set; }
 
         public DbSet<vw_logs_register> vw_logs_registers { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
