@@ -8,7 +8,9 @@ namespace api_solsql.Models
         public int comment_id { get; set; }
 
         public int place_id { get; set; }
+        public string? name_place { get; set; }
         public int id { get; set; }
+        public string? name { get; set; }
         public string? comment { get; set; }
         public int? parent_comment_id { get; set; }
         public DateTime? comment_date { get; set; }
