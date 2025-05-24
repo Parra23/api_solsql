@@ -23,7 +23,7 @@ namespace api_solsql.Controllers
         {
             try
             {
-                var totalCommentsUsers = await _context.vw_totalcomments_user
+                var totalCommentsUsers = await _context.vw_totalcomments_users
                     .FromSqlInterpolated($"CALL sp_totalcomments_users()")
                     .ToListAsync();
 
