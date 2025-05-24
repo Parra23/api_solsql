@@ -1,9 +1,7 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api_solsql.Context;
 using api_solsql.Models;
-using MySqlConnector;
 
 namespace api_solsql.Controllers
 {
@@ -25,8 +23,8 @@ namespace api_solsql.Controllers
             try
             {
                 var logsList = await _context.vw_logs_registers
-                    .FromSqlRaw("CALL sp_get_logs_register()")
-                    .ToListAsync();
+                    .FromSqlInterpolated($"CALL sp_get_logs_register()")
+                    .ToListAsync(); 
                 return Ok(logsList);
             }
             catch (Exception ex)

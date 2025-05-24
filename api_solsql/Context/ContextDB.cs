@@ -19,9 +19,13 @@ namespace api_solsql.Context
         public DbSet<Places> places { get; set; }
 
         public DbSet<vw_logs_register> vw_logs_registers { get; set; }
+        public DbSet<vw_totalcomments_date> vw_totalcomments_dates { get; set; }
+        public DbSet<vw_totalcomments_users> vw_totalcomments_user { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<vw_logs_register>().HasNoKey();
+            modelBuilder.Entity<vw_totalcomments_date>().HasNoKey();
+            modelBuilder.Entity<vw_totalcomments_users>().HasNoKey();
             modelBuilder.Entity<CommentsPlace>()
                 .HasNoKey()
                 .ToView(null);
