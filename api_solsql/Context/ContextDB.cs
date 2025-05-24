@@ -18,11 +18,15 @@ namespace api_solsql.Context
         public DbSet<CommentsPlace> commentsPlace { get; set; }
         public DbSet<Places> places { get; set; }
 
+        public DbSet<vw_general_lugar> vw_general_lugar { get; set; }
         public DbSet<vw_logs_register> vw_logs_registers { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<vw_logs_register>().HasNoKey();
             modelBuilder.Entity<CommentsPlace>()
+                .HasNoKey()
+                .ToView(null);
+            modelBuilder.Entity<vw_general_lugar>()
                 .HasNoKey()
                 .ToView(null);
             base.OnModelCreating(modelBuilder);
