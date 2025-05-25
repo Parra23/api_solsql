@@ -98,14 +98,16 @@ namespace api_solsql.Controllers
             {
                 var result = await _context.favorites
                     .FromSqlInterpolated($"CALL pa_get_favorite_by_user_place({userId}, {placeId})")
-                    .FirstOrDefaultAsync();
+                    .ToListAsync();
 
-                if (result == null)
+                var favorite = result.FirstOrDefault();
+
+                if (favorite == null)
                 {
                     return NotFound(new { message = "Favorito no encontrado para el usuario y lugar especificados." });
                 }
 
-                return Ok(result);
+                return Ok(favorite);
             }
             catch (Exception ex)
             {
