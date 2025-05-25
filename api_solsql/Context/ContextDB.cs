@@ -17,6 +17,7 @@ namespace api_solsql.Context
         public DbSet<Comments> comments { get; set; }
         public DbSet<CommentsPlace> commentsPlace { get; set; }
         public DbSet<Places> places { get; set; }
+        public DbSet<Favorites> favorites { get; set; }
 
         public DbSet<vw_general_lugar> vw_general_lugar { get; set; }
         public DbSet<vw_logs_register> vw_logs_registers { get; set; }
