@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using api_solsql.Context;
 using api_solsql.Models;
+using System.Xml.Linq;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 
 namespace api_solsql.Controllers
 {
@@ -19,6 +21,37 @@ namespace api_solsql.Controllers
         public PlacesController(ContextDB context)
         {
             _context = context;
+        }
+
+        //GET /api/lugares/7/detalle
+        //GET /api/lugares/7/detalle?userId=3
+        [HttpGet("{id}/detalle")]
+        public async Task<ActionResult<PlaceDetail>> ObtenerDetalle(int id, [FromQuery] int? userId)
+        {
+            try
+            {
+                var resultados = await _context.placeDetail
+                    .FromSqlInterpolated($"CALL pa_detalle_lugar_interaccion_usuario({id}, {userId})")
+                    .ToListAsync();
+
+                var resultado = resultados.FirstOrDefault();
+
+                if (resultado == null)
+                {
+                    return NotFound(new { mensaje = "Lugar no encontrado." });
+                }
+
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                // Log opcional: Console.WriteLine(ex.Message); o usar un logger
+                return StatusCode(500, new
+                {
+                    mensaje = "Ocurrió un error al obtener el detalle del lugar.",
+                    error = ex.Message
+                });
+            }
         }
 
         // GET: api/Places/info_rapida
