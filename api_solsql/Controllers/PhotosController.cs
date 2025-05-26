@@ -88,15 +88,10 @@ namespace api_solsql.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPhotos(int id, [FromBody] Photos photos)
         {
-            if (id != photos.photo_id)
-            {
-                return BadRequest("El ID de la foto no coincide.");
-            }
-
             try
             {
                 int result = await _context.Database.ExecuteSqlInterpolatedAsync(
-                    $"CALL sp_update_photos({photos.photo_id}, {photos.url}, {photos.description})"
+                    $"CALL sp_update_photos({id}, {photos.url}, {photos.description})"
                 );
 
                 return Ok(new { message = "Successfully updated registration." });
