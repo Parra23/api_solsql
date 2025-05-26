@@ -67,7 +67,7 @@ namespace api_solsql.Controllers
 
         // GET: api/Favorites/byUser/3
         [HttpGet("byUser/{user_id}")]
-        public async Task<ActionResult<Favorites>> GetFavoritesPorUsuario(int user_id)
+        public async Task<ActionResult<IEnumerable<Favorites>>> GetFavoritesPorUsuario(int user_id)
         {
             try
             {
