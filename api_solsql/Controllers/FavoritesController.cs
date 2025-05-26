@@ -75,14 +75,7 @@ namespace api_solsql.Controllers
                     .FromSqlInterpolated($"CALL pa_get_favorite_by_user({user_id})")
                     .ToListAsync();
 
-                var favorite = favorites.FirstOrDefault();
-
-                if (favorite == null)
-                {
-                    return NotFound($"No se encontró los favoritos del usuario con id {user_id}.");
-                }
-
-                return Ok(favorite);
+                return Ok(favorites);
             }
             catch (Exception ex)
             {
