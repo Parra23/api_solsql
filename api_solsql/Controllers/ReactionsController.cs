@@ -151,6 +151,64 @@ namespace api_solsql.Controllers
             }
         }
 
+        // GET: api/Reactions/user/{userId}/place/{placeId}
+        [HttpGet("user/{userId}/place/{placeId}")]
+        public async Task<ActionResult<Reactions>> GetReactionByUserAndPlace(int userId, int placeId)
+        {
+            try
+            {
+                var result = await _context.reactions
+                    .FromSqlInterpolated($"CALL pa_get_reaction_by_idUser_idPlace({userId}, {placeId})")
+                    .ToListAsync();
+
+                var reaction = result.FirstOrDefault();
+
+                if (reaction == null)
+                {
+                    return NotFound(new { message = "Reaccion no encontrado para el usuario y lugar especificados." });
+                }
+
+                return Ok(reaction);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    error = "Error al obtener la reaccion.",
+                    detail = ex.Message
+                });
+            }
+        }
+
+        // DELETE: api/Reactions/usuario/5/lugar/4
+        [HttpDelete("usuario/{idUsuario}/lugar/{idLugar}")]
+        public async Task<IActionResult> DeleteReaction(int idUsuario, int idLugar)
+        {
+            try
+            {
+                await _context.Database.ExecuteSqlInterpolatedAsync(
+                    $"CALL pa_delete_reaction_by_idUser_idPlace({idUsuario}, {idLugar})"
+                );
+
+                return NoContent(); // 204
+            }
+            catch (DbUpdateException ex)
+            {
+                return BadRequest(new
+                {
+                    error = "No se pudo eliminar la reaccion.",
+                    detail = ex.InnerException?.Message ?? ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    error = "Error interno del servidor.",
+                    detail = ex.Message
+                });
+            }
+        }
 
         private bool ReactionsExists(int id)
         {
