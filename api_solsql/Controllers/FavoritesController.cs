@@ -205,6 +205,37 @@ namespace api_solsql.Controllers
             }
         }
 
+        // DELETE: api/Favorites/usuario/5/lugar/4
+        [HttpDelete("usuario/{idUsuario}/lugar/{idLugar}")]
+        public async Task<IActionResult> DeleteFavorite(int idUsuario, int idLugar)
+        {
+            try
+            {
+                await _context.Database.ExecuteSqlInterpolatedAsync(
+                    $"CALL pa_delete_favorite_by_user_place({idUsuario}, {idLugar})"
+                );
+
+                return NoContent(); // 204
+            }
+            catch (DbUpdateException ex)
+            {
+                return BadRequest(new
+                {
+                    error = "No se pudo eliminar el favorito.",
+                    detail = ex.InnerException?.Message ?? ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    error = "Error interno del servidor.",
+                    detail = ex.Message
+                });
+            }
+        }
+
+
 
         private bool FavoritesExists(int id)
         {
