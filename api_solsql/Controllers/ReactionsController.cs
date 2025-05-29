@@ -102,9 +102,7 @@ namespace api_solsql.Controllers
         {
             try
             {
-                await _context.Database.ExecuteSqlInterpolatedAsync($@"
-                    CALL sp_insert_reactions({reactions.id}, {reactions.place_id}, {reactions.reaction_type})
-                    ");
+                await _context.Database.ExecuteSqlInterpolatedAsync($"CALL sp_insert_reactions({reactions.user_id}, {reactions.place_id}, {reactions.reaction_type})");
 
                 return Ok(new
                 {
