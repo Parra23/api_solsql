@@ -1,6 +1,5 @@
 using api_solsql.Context;
 using api_solsql.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
@@ -27,6 +26,7 @@ namespace api_solsql.Controllers
                 var users = await _context.LoginRequests
                     .FromSqlInterpolated($"CALL sp_login({request.Email}, {request.Role})")
                     .ToListAsync();
+
                 if (users.Count == 0)
                     return Unauthorized(new { message = "User not found" });
                 var user = users.First();

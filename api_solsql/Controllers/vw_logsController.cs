@@ -1,7 +1,5 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using api_solsql.Context;
 using api_solsql.Models;
 namespace api_solsql.Controllers
 {
