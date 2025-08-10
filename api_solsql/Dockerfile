@@ -1,18 +1,15 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 
-# Copiar y restaurar dependencias
-COPY ["api_solsql.csproj", "./"]
-RUN dotnet restore "./api_solsql.csproj"
+COPY ["api_solsql/api_solsql.csproj", "api_solsql/"]
+RUN dotnet restore "api_solsql/api_solsql.csproj"
 
-# Copiar todo y compilar
 COPY . .
-WORKDIR "/src"
+
+WORKDIR "/src/api_solsql"
 RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
 
-# Imagen final
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
-EXPOSE 8080
-ENTRYPOINT ["dotnet", "api_solsql.dll"] 
+ENTRYPOINT ["dotnet", "api_solsql.dll"]
