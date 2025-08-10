@@ -32,6 +32,7 @@ namespace api_solsql
                         .AllowAnyMethod()
                         .AllowAnyHeader());
             });
+            
             // Habilitar el caché de respuestas
             builder.Services.AddResponseCaching();
 

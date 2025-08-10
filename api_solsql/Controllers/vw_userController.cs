@@ -163,7 +163,6 @@ namespace api_solsql.Controllers
             {
                 var users_delete = await _context.Database
                     .ExecuteSqlInterpolatedAsync($"CALL sp_delete_user({id})");
-
                 return Ok(users_delete);
             }
             catch (MySqlException ex)
